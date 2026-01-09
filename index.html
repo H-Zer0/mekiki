@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>MEKIKI | 食材の目利き・保存方法</title>
+
+    <!-- PWA Settings for iPhone -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MEKIKI">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <!-- SEO & Icons -->
+    <meta name="description" content="買い物中に瞬時に食材の美味しい選び方と保存方法を確認できるアプリ">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="食材名で検索..." autocomplete="off">
+        </div>
+    </header>
+
+    <div class="tabs" id="categoryTabs">
+        <button class="tab active" data-category="all">すべて</button>
+        <button class="tab" data-category="野菜">野菜</button>
+        <button class="tab" data-category="果物">果物</button>
+        <button class="tab" data-category="肉">肉</button>
+        <button class="tab" data-category="魚">魚</button>
+    </div>
+
+    <main class="grid" id="foodGrid">
+        <!-- 食材カードが動的に挿入されます -->
+    </main>
+
+    <!-- 詳細モーダル -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="foodTitle">食材名</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title"><i class="fa-solid fa-eye"></i> おいしい個体の見分け方</h3>
+                <div id="selectInfo"></div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title"><i class="fa-solid fa-box-archive"></i> 正しい保存方法</h3>
+                <div id="storeInfo"></div>
+            </div>
+
+            <div class="source-links" id="sourceLinks">
+                出典：<br>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active">
+            <i class="fa-solid fa-house"></i>
+            <span>ホーム</span>
+        </button>
+        <button class="nav-item">
+            <i class="fa-solid fa-bookmark"></i>
+            <span>お気に入り</span>
+        </button>
+        <button class="nav-item">
+            <i class="fa-solid fa-gear"></i>
+            <span>設定</span>
+        </button>
+    </nav>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
