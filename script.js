@@ -803,6 +803,13 @@ const EMPTY_MESSAGE = document.getElementById('emptyMessage');
 
 let currentCategory = 'all';
 let detailTrigger = null;
+let historyNavigationPending = false;
+let historyClosePending = false;
+
+function detailFoodFromState(state) {
+    if (state?.mekikiDetail?.version !== 1) return null;
+    return foodData.find(food => food.id === state.mekikiDetail.foodId) || null;
+}
 
 // カタカナをひらがなにそろえて検索する。
 function normalizeSearchText(text) {
@@ -827,6 +834,7 @@ function renderCards(filter = '') {
     filtered.forEach(food => {
         const card = document.createElement('button');
         card.type = 'button';
+        card.dataset.foodId = String(food.id);
         card.className = 'card';
         const parts = [
             ['card-icon', food.icon || ''],
@@ -846,7 +854,21 @@ function renderCards(filter = '') {
     });
 }
 
-function showDetail(food, trigger) {
+function showDetail(food, trigger, fromHistory = false) {
+    if (historyNavigationPending || historyClosePending) return;
+    if (!fromHistory) {
+        if (DETAIL_MODAL.open) return;
+        // 元の履歴エントリーは変更せず、新しいエントリーに状態を保持する。
+        try {
+            history.pushState({
+                mekikiDetail: { version: 1, foodId: food.id },
+                previousState: history.state
+            }, '');
+        } catch (error) {
+            // 履歴が利用できない環境でも、詳細の閲覧と通常の閉じる操作を保つ。
+            console.warn('詳細画面の履歴を追加できませんでした。');
+        }
+    }
     detailTrigger = trigger;
     document.getElementById('foodTitle').innerText = `${food.icon || ''} ${food.name}`;
 
@@ -870,7 +892,7 @@ function showDetail(food, trigger) {
     const sourceLinks = document.getElementById('sourceLinks');
     sourceLinks.innerHTML = '出典：<br>' + food.sources.map(s => `<a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.name} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>`).join(' | ');
 
-    DETAIL_MODAL.showModal();
+    if (!DETAIL_MODAL.open) DETAIL_MODAL.showModal();
     DETAIL_MODAL.querySelector('.modal-content').scrollTop = 0;
 }
 
@@ -911,9 +933,34 @@ DETAIL_MODAL.onclick = (e) => {
 };
 
 DETAIL_MODAL.addEventListener('close', () => {
+    if (historyClosePending) {
+        historyClosePending = false;
+    } else if (detailFoodFromState(history.state)) {
+        historyNavigationPending = true;
+        history.back();
+    }
     if (detailTrigger && detailTrigger.isConnected) detailTrigger.focus();
     detailTrigger = null;
+    // closeイベント待ちに「進む」が発生した場合も、現在の履歴に合わせる。
+    if (!historyNavigationPending) syncDetailWithHistory();
+});
+
+function syncDetailWithHistory() {
+    const food = detailFoodFromState(history.state);
+    if (food) {
+        const card = FOOD_GRID.querySelector(`[data-food-id="${food.id}"]`);
+        showDetail(food, card || SEARCH_INPUT, true);
+    } else if (DETAIL_MODAL.open) {
+        historyClosePending = true;
+        DETAIL_MODAL.close();
+    }
+}
+
+window.addEventListener('popstate', () => {
+    historyNavigationPending = false;
+    syncDetailWithHistory();
 });
 
 // Initial Render
 renderCards();
+syncDetailWithHistory();
