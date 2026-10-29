@@ -801,7 +801,7 @@ const CLOSE_MODAL = document.getElementById('closeModal');
 let currentCategory = 'all';
 
 function renderCards(filter = '') {
-    FOOD_GRID.innerHTML = '';
+    FOOD_GRID.textContent = '';
     const filtered = foodData.filter(food => {
         const matchesSearch = food.name.includes(filter);
         const matchesCategory = currentCategory === 'all' || food.category === currentCategory;
@@ -841,7 +841,7 @@ function showDetail(food) {
 
     // 出典
     const sourceLinks = document.getElementById('sourceLinks');
-    sourceLinks.innerHTML = '出典：<br>' + food.sources.map(s => `<a href="${s.url}" target="_blank">${s.name} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>`).join(' | ');
+    sourceLinks.innerHTML = '出典：<br>' + food.sources.map(s => `<a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.name} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>`).join(' | ');
 
     DETAIL_MODAL.style.display = 'flex';
 }
