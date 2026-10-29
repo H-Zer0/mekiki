@@ -797,30 +797,57 @@ const FOOD_GRID = document.getElementById('foodGrid');
 const CATEGORY_TABS = document.getElementById('categoryTabs');
 const DETAIL_MODAL = document.getElementById('detailModal');
 const CLOSE_MODAL = document.getElementById('closeModal');
+const CLEAR_SEARCH = document.getElementById('clearSearch');
+const RESULT_COUNT = document.getElementById('resultCount');
+const EMPTY_MESSAGE = document.getElementById('emptyMessage');
 
 let currentCategory = 'all';
+let detailTrigger = null;
+
+// カタカナをひらがなにそろえて検索する。
+function normalizeSearchText(text) {
+    return text.replace(/[ァ-ヶ]/g, char =>
+        String.fromCharCode(char.charCodeAt(0) - 0x60)
+    );
+}
 
 function renderCards(filter = '') {
     FOOD_GRID.textContent = '';
+    const normalizedFilter = normalizeSearchText(filter);
     const filtered = foodData.filter(food => {
-        const matchesSearch = food.name.includes(filter);
+        const matchesSearch = normalizeSearchText(food.name).includes(normalizedFilter);
         const matchesCategory = currentCategory === 'all' || food.category === currentCategory;
         return matchesSearch && matchesCategory;
     });
 
+    RESULT_COUNT.textContent = `${filtered.length}件の食材`;
+    EMPTY_MESSAGE.hidden = filtered.length !== 0;
+    CLEAR_SEARCH.hidden = SEARCH_INPUT.value.length === 0;
+
     filtered.forEach(food => {
-        const card = document.createElement('div');
+        const card = document.createElement('button');
+        card.type = 'button';
         card.className = 'card';
-        card.innerHTML = `
-            <span class="card-icon">${food.icon || ''}</span>
-            <span class="card-name">${food.name}</span>
-        `;
-        card.onclick = () => showDetail(food);
+        const parts = [
+            ['card-icon', food.icon || ''],
+            ['card-name', food.name],
+            ['card-category', food.category],
+            ['card-action', '詳細を見る →']
+        ];
+        parts.forEach(([className, text]) => {
+            const span = document.createElement('span');
+            span.className = className;
+            span.textContent = text;
+            if (className === 'card-icon') span.setAttribute('aria-hidden', 'true');
+            card.appendChild(span);
+        });
+        card.onclick = () => showDetail(food, card);
         FOOD_GRID.appendChild(card);
     });
 }
 
-function showDetail(food) {
+function showDetail(food, trigger) {
+    detailTrigger = trigger;
     document.getElementById('foodTitle').innerText = `${food.icon || ''} ${food.name}`;
 
     // 見分け方
@@ -843,30 +870,50 @@ function showDetail(food) {
     const sourceLinks = document.getElementById('sourceLinks');
     sourceLinks.innerHTML = '出典：<br>' + food.sources.map(s => `<a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.name} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>`).join(' | ');
 
-    DETAIL_MODAL.style.display = 'flex';
+    DETAIL_MODAL.showModal();
+    DETAIL_MODAL.querySelector('.modal-content').scrollTop = 0;
 }
 
 // Event Listeners
 SEARCH_INPUT.oninput = (e) => renderCards(e.target.value);
 
+CLEAR_SEARCH.onclick = () => {
+    SEARCH_INPUT.value = '';
+    renderCards();
+    SEARCH_INPUT.focus();
+};
+
 CATEGORY_TABS.onclick = (e) => {
-    if (e.target.classList.contains('tab')) {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        e.target.classList.add('active');
-        currentCategory = e.target.dataset.category;
+    const tab = e.target.closest('.tab');
+    if (tab && CATEGORY_TABS.contains(tab)) {
+        CATEGORY_TABS.querySelectorAll('.tab').forEach(t => {
+            const selected = t === tab;
+            t.classList.toggle('active', selected);
+            t.setAttribute('aria-pressed', String(selected));
+        });
+        currentCategory = tab.dataset.category;
         renderCards(SEARCH_INPUT.value);
     }
 };
 
 CLOSE_MODAL.onclick = () => {
-    DETAIL_MODAL.style.display = 'none';
+    DETAIL_MODAL.close();
 };
 
-window.onclick = (e) => {
+DETAIL_MODAL.onclick = (e) => {
     if (e.target === DETAIL_MODAL) {
-        DETAIL_MODAL.style.display = 'none';
+        const bounds = DETAIL_MODAL.getBoundingClientRect();
+        if (e.clientX < bounds.left || e.clientX > bounds.right ||
+            e.clientY < bounds.top || e.clientY > bounds.bottom) {
+            DETAIL_MODAL.close();
+        }
     }
 };
+
+DETAIL_MODAL.addEventListener('close', () => {
+    if (detailTrigger && detailTrigger.isConnected) detailTrigger.focus();
+    detailTrigger = null;
+});
 
 // Initial Render
 renderCards();

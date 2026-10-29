@@ -1,24 +1,32 @@
 :root {
-    --primary: #00c853;
-    --primary-dark: #009624;
-    --background: #f8f9fa;
+    --primary: #166534;
+    --primary-dark: #14532d;
+    --background: #f6f8f7;
     --surface: #ffffff;
-    --text: #1a1a1a;
-    --text-muted: #666666;
-    --border: #e0e0e0;
+    --text: #17251c;
+    --text-muted: #526158;
+    --border: #dce4df;
+    --input-border: #78877d;
+    --on-primary: #ffffff;
+    --selection-badge: #166534;
     --accent: #ff9100;
-    --safe: #2979ff;
-    --shadow: 0 4px 12px rgba(0,0,0,0.08);
-    --radius: 16px;
+    --safe: #1d4ed8;
+    --shadow: 0 2px 8px rgba(23,37,28,0.05);
+    --radius: 12px;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --background: #121212;
-        --surface: #1e1e1e;
-        --text: #f5f5f5;
-        --text-muted: #aaaaaa;
-        --border: #333333;
+        --primary: #86efac;
+        --primary-dark: #4ade80;
+        --on-primary: #111a15;
+        --background: #111a15;
+        --surface: #1b2820;
+        --text: #f1f5f2;
+        --text-muted: #b4c4b9;
+        --border: #3c5144;
+        --input-border: #82988a;
+        --shadow: 0 2px 8px rgba(0,0,0,0.18);
     }
 }
 
@@ -30,23 +38,39 @@
 }
 
 body {
-    font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
     background-color: var(--background);
     color: var(--text);
-    line-height: 1.6;
-    font-size: 18px; /* 大きめの基本フォント */
+    line-height: 1.7;
+    font-size: 1rem;
     overflow-x: hidden;
-    padding-bottom: 90px; /* ボトムナビの高さ分 */
+    padding-bottom: 24px;
 }
 
 /* 検索ヘッダー */
 .header {
-    position: sticky;
-    top: 0;
     background-color: var(--surface);
-    padding: 16px 20px;
-    z-index: 100;
+    padding: 24px 20px 16px;
     box-shadow: var(--shadow);
+}
+
+.site-title {
+    color: var(--primary);
+    font-size: 2rem;
+    line-height: 1.2;
+    margin-bottom: 8px;
+}
+
+.site-description {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 24px;
+}
+
+.search-label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
 
 .search-box {
@@ -56,18 +80,49 @@ body {
 
 .search-input {
     width: 100%;
-    padding: 16px 20px 16px 48px;
-    border: 2px solid var(--border);
-    border-radius: 50px;
+    padding: 16px 88px 16px 48px;
+    border: 2px solid var(--input-border);
+    border-radius: 12px;
     background-color: var(--background);
     color: var(--text);
-    font-size: 20px;
+    font-family: inherit;
+    font-size: 1.125rem;
     outline: none;
     transition: border-color 0.3s;
 }
 
 .search-input:focus {
     border-color: var(--primary);
+}
+
+.search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    min-height: 44px;
+    padding: 8px;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+}
+
+.search-clear:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.result-count,
+.empty-message {
+    margin: 8px 20px 0;
+    color: var(--text-muted);
+}
+
+.result-count {
+    font-size: 0.875rem;
 }
 
 .search-icon {
@@ -82,7 +137,7 @@ body {
 /* カテゴリタブ */
 .tabs {
     display: flex;
-    overflow-x: auto;
+    flex-wrap: wrap;
     padding: 12px 20px;
     gap: 12px;
     scrollbar-width: none;
@@ -98,7 +153,8 @@ body {
     border: 1px solid var(--border);
     border-radius: 50px;
     white-space: nowrap;
-    font-size: 16px;
+    font-family: inherit;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-muted);
     cursor: pointer;
@@ -107,11 +163,45 @@ body {
 
 .tab.active {
     background-color: var(--primary);
-    color: white;
+    color: var(--on-primary);
     border-color: var(--primary);
+    font-weight: 700;
+}
+
+.tab {
+    color: var(--text);
+}
+
+.tab-check {
+    display: inline-block;
+    width: 1em;
+    margin-right: 4px;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.tab.active .tab-check {
+    visibility: visible;
+}
+
+.tab:focus-visible {
+    outline: 3px solid #1d4ed8;
+    outline-offset: 3px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .tab:focus-visible {
+        outline-color: #93c5fd;
+    }
 }
 
 /* 食材リスト */
+.food-list-title {
+    padding: 16px 20px 0;
+    font-size: 1.25rem;
+    line-height: 1.5;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -120,17 +210,35 @@ body {
 }
 
 .card {
+    min-width: 0;
+    width: 100%;
+    font: inherit;
+    color: var(--text);
+    cursor: pointer;
+    overflow-wrap: anywhere;
     background-color: var(--surface);
     border-radius: var(--radius);
     padding: 20px;
     text-align: center;
     box-shadow: var(--shadow);
-    transition: transform 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
     border: 1px solid var(--border);
 }
 
 .card:active {
-    transform: scale(0.95);
+    border-color: var(--primary);
+}
+
+.card:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
+}
+
+@media (hover: hover) {
+    .card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 3px 12px rgba(23,37,28,0.12);
+    }
 }
 
 .card-icon {
@@ -140,33 +248,70 @@ body {
 }
 
 .card-name {
-    font-size: 18px;
+    display: block;
+    font-size: 1.125rem;
     font-weight: 700;
+}
+
+.card-category,
+.card-action {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.875rem;
+}
+
+.card-category {
+    color: var(--text-muted);
+}
+
+.card-action {
+    color: var(--primary);
+    font-weight: 600;
 }
 
 /* 詳細モーダル */
 .modal {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: auto 0 0;
+    margin: 0 auto;
+    padding: 0;
     width: 100%;
-    height: 100%;
+    max-width: 640px;
+    max-height: 90vh;
+    max-height: 90dvh;
+    border: none;
+    border-radius: 24px 24px 0 0;
+    background: var(--surface);
+    color: var(--text);
+    overflow: hidden;
+}
+
+.modal::backdrop {
     background: rgba(0,0,0,0.5);
-    z-index: 200;
-    display: none;
-    align-items: flex-end;
+}
+
+body:has(.modal[open]) {
+    overflow: hidden;
 }
 
 .modal-content {
     background-color: var(--surface);
     width: 100%;
     max-height: 90vh;
+    max-height: 90dvh;
     border-radius: 24px 24px 0 0;
-    padding: 32px 24px;
+    padding: 0 24px calc(24px + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
 }
 
 .modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--surface);
+    padding: 16px 0;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -174,12 +319,16 @@ body {
 }
 
 .modal-title {
-    font-size: 28px;
-    font-weight: 800;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.4;
 }
 
 .close-btn {
+    flex-shrink: 0;
     background: var(--background);
+    color: var(--text);
+    font-family: inherit;
     border: none;
     width: 44px; /* 親指サイズ */
     height: 44px;
@@ -188,12 +337,25 @@ body {
     cursor: pointer;
 }
 
+.close-btn:focus-visible,
+.source-links a:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
+}
+
+.modal-title,
+.info-item,
+.source-links {
+    overflow-wrap: anywhere;
+}
+
 .section {
     margin-bottom: 32px;
 }
 
 .section-title {
-    font-size: 20px;
+    font-size: 1.25rem;
+    line-height: 1.5;
     font-weight: 700;
     color: var(--primary);
     margin-bottom: 16px;
@@ -207,28 +369,28 @@ body {
     padding: 16px;
     border-radius: 12px;
     margin-bottom: 12px;
-    font-size: 18px;
+    font-size: 1rem;
 }
 
 .badge {
     display: inline-block;
     padding: 4px 12px;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 700;
     margin-right: 8px;
     color: white;
 }
 
-.bg-select { background-color: var(--primary); }
+.bg-select { background-color: var(--selection-badge); }
 .bg-store { background-color: var(--safe); }
 
 .source-links {
-    font-size: 14px;
+    font-size: 0.875rem;
     color: var(--text-muted);
     border-top: 1px solid var(--border);
     padding-top: 20px;
-    margin-top: 40px;
+    margin-top: 32px;
 }
 
 .source-links a {
@@ -250,7 +412,8 @@ body {
 }
 
 .nav-item {
-    font-size: 12px;
+    font-family: inherit;
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--text-muted);
     background: none;
