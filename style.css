@@ -1,4 +1,5 @@
 :root {
+    color-scheme: light;
     --primary: #166534;
     --primary-dark: #14532d;
     --background: #f6f8f7;
@@ -17,6 +18,7 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
+        color-scheme: dark;
         --primary: #86efac;
         --primary-dark: #4ade80;
         --on-primary: #111a15;
@@ -45,6 +47,19 @@ body {
     font-size: 1rem;
     overflow-x: hidden;
     padding-bottom: 24px;
+}
+
+button,
+input {
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-text-fill-color: currentColor;
+}
+
+.search-input::placeholder {
+    color: var(--text-muted);
+    -webkit-text-fill-color: var(--text-muted);
+    opacity: 1;
 }
 
 /* 検索ヘッダー */
@@ -204,7 +219,7 @@ body {
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
     padding: 16px 20px;
 }
@@ -272,18 +287,24 @@ body {
 /* 詳細モーダル */
 .modal {
     position: fixed;
-    inset: auto 0 0;
-    margin: 0 auto;
+    inset: 0;
+    margin: auto;
     padding: 0;
-    width: 100%;
+    width: calc(100% - 24px);
     max-width: 640px;
-    max-height: 90vh;
-    max-height: 90dvh;
+    height: 90vh;
+    height: 90dvh;
+    max-height: calc(100% - 24px);
     border: none;
-    border-radius: 24px 24px 0 0;
+    border-radius: 16px;
     background: var(--surface);
     color: var(--text);
     overflow: hidden;
+}
+
+.modal[open] {
+    display: flex;
+    flex-direction: column;
 }
 
 .modal::backdrop {
@@ -295,33 +316,51 @@ body:has(.modal[open]) {
 }
 
 .modal-content {
+    flex: 1;
+    min-height: 0;
+    color: var(--text);
     background-color: var(--surface);
     width: 100%;
-    max-height: 90vh;
-    max-height: 90dvh;
-    border-radius: 24px 24px 0 0;
-    padding: 0 24px calc(24px + env(safe-area-inset-bottom, 0px));
+    padding: 16px 20px calc(24px + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .modal-header {
-    position: sticky;
-    top: 0;
-    z-index: 1;
+    flex-shrink: 0;
+    color: var(--text);
     background: var(--surface);
-    padding: 16px 0;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 16px;
     gap: 16px;
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 0;
 }
 
 .modal-title {
+    min-width: 0;
     font-size: 1.5rem;
     font-weight: 700;
     line-height: 1.4;
+}
+
+@media (max-width: 360px) {
+    .grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .header,
+    .tabs,
+    .grid {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .search-input {
+        padding-left: 40px;
+    }
 }
 
 .close-btn {
